@@ -9,6 +9,15 @@ const ApiError = require("../utils/apiError");
 const createToken = require("../utils/createToken");
 
 const User = require("../models/userModel");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+
+
+
+
+
+// Upload single image
+exports.uploadCategoryImage = uploadSingleImage("avatarImage");
+
 
 // @desc    Signup
 // @route   GET /api/v1/auth/signup
@@ -115,32 +124,40 @@ exports.allowedTo = (...roles) =>
     next();
   });
 
+exports.getAllUsers = asyncHandler(async (req, res, next) => {
+      const users = await User.find({ _id: { $ne: req.params.id } }).select([
+        "email",
+        "username",
+        "avatarImage",
+        "_id",
+      ]);
+      return res.json(users);
+  });
 
-exports.setAvatar = asyncHandler(async (req, res, next) => {
-      const userId = req.params.id;
-      const avatarImage = req.body.image;
+  module.exports.setAvatar = asyncHandler(async (req, res, next) => {
+     
       const userData = await User.findByIdAndUpdate(
-        userId,
+        req.params.id,
         {
           isAvatarImageSet: true,
-          avatarImage,
+          avatarImage:req.body.image,
         },
         { new: true }
       );
-      
-      return res.json({
-        isSet: userData.isAvatarImageSet,
-        image: userData.avatarImage,
+
+      if (!userData) {
+        return next(new ApiError(`No document for this id ${req.params.id}`, 404));
+      }
+      res.status(200).json({ data: userData });
       });
+
+
+
+
+exports.logOut = asyncHandler((req, res, next) => {
+    
+      if (!req.params.id) next(new ApiError("User id is required", 401));
+      onlineUsers.delete(req.params.id);
+      return res.status(200).send();
+    
   });
-
-
-// exports.logOut = (req, res, next) => {
-//     try {
-//       if (!req.params.id) next(new ApiError("User id is required", 401));
-//       onlineUsers.delete(req.params.id);
-//       return res.status(200).send();
-//     } catch (ex) {
-//       next(ex);
-//     }
-//   };

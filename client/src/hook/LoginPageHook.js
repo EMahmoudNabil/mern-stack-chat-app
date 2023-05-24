@@ -36,14 +36,16 @@ const LoginPageHook = () => {
     useEffect(() => {
         if (loading === false) {
             if (res) {
-                console.log(res)
-                if (res.data.token) {
-                    localStorage.setItem("token", res.data.token)
-                    localStorage.setItem("user", JSON.stringify(res.data.data))
+                // console.log(res.token)
+                if (res.token) {
+                    localStorage.setItem("token", res.token)
+                    localStorage.setItem("user", JSON.stringify(res.data))
                     notify("تم تسجيل الدخول بنجاح", "success")
                     setTimeout(() => {
                         window.location.href = "/"
-                    }, 1500);
+                        // console.log('login')
+                        // navigate('/');
+                    }, 2000);
                 } else {
                     localStorage.removeItem("token")
                     localStorage.removeItem("user")

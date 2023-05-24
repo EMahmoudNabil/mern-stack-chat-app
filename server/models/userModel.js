@@ -19,7 +19,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
    
-    avatarImage: String,
+    avatarImage: {
+      type: String,
+      default: "",
+    },
     isAvatarImageSet: {
       type: Boolean,
       default: false,

@@ -1,13 +1,13 @@
 import baseUrl from '../Api/baseURL'
 
-const useGetData = async (url, parmas) => {
+const UseGetData = async (url, parmas) => {
 
     const res = await baseUrl.get(url, parmas);
     return res.data;
 }
 
 
-const useGetDataToken = async (url, parmas) => {
+const UseGetDataToken = async (url, parmas) => {
     const config = {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
     }
@@ -15,4 +15,4 @@ const useGetDataToken = async (url, parmas) => {
     return res.data;
 }
 
-export { useGetData, useGetDataToken };
+export { UseGetData, UseGetDataToken };

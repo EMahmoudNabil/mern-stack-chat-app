@@ -70,20 +70,20 @@ const RegisterPageHooks = () => {
         if (loading === false) {
             if (res) {
                 console.log(res)
-                if (res.data.token) {
-                    localStorage.setItem("token", res.data.token)
+                if (res.token) {
+                    localStorage.setItem("token", res.token)
                     notify("تم تسجيل الحساب بنجاح", "success")
                     setTimeout(() => {
                         navigate('/login')
                     }, 2000);
                 }
 
-                if (res.data.errors) {
+                if (res.errors) {
                     if (res.data.errors[0].msg === "E-mail already in user")
                         notify("هذا الايميل مسجل من قبل", "error")
                 }
 
-                if (res.data.errors) {
+                if (res.errors) {
                     if (res.data.errors[0].msg === "must be at least 6 chars")
                         notify("يجب ان لاقل كلمه السر عن 6 احرف او ارقام", "error")
                 }

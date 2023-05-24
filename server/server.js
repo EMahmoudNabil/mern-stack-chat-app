@@ -1,11 +1,9 @@
 const path = require("path");
-
+const socket = require("socket.io");
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 
-
-// eslint-disable-next-line import/newline-after-import
 const cors = require("cors");
 dotenv.config({ path: "config.env" });
 const ApiError = require("./utils/apiError");
@@ -15,22 +13,15 @@ const dbConnection = require("./config/database");
 // Routes
 const mountRoutes = require("./routes");
 
-
 // Connect with db
 dbConnection();
 
 // express app
 const app = express();
 
-
 // Allow requests from any origin
-// Enable other domains to access your application
 app.use(cors());
 app.options("*", cors());
-
-
-
-
 
 // Middlewares
 app.use(express.json({ limit: "20kb" }));
@@ -40,13 +31,6 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
-
-
-
-
-
-
-
 
 // Mount Routes
 mountRoutes(app);
@@ -60,7 +44,29 @@ app.use(globalError);
 
 const PORT = process.env.PORT || 8005;
 const server = app.listen(PORT, () => {
-  console.log(`App running running on port ${PORT}`);
+  console.log(`App running on port ${PORT}`);
+});
+
+const io = socket(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    credentials: true,
+  },
+});
+
+global.onlineUsers = new Map();
+io.on("connection", (socket) => {
+  global.chatSocket = socket;
+  socket.on("add-user", (userId) => {
+    onlineUsers.set(userId, socket.id);
+  });
+
+  socket.on("send-msg", (data) => {
+    const sendUserSocket = onlineUsers.get(data.to);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+    }
+  });
 });
 
 // Handle rejection outside express
